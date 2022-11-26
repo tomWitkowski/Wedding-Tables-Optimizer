@@ -18,12 +18,7 @@ async def optimize_tables(
     opt: OptimizationData = ...
 ):
     """
-    to be deifned:
-    
-    family_friends_not_score
-    table init - max_seats
-    table init - seats - initial set of seats
-    optimize - iterations
+    Function maximizing average relations between guests inside tables
     """
     # adds antirelations between family and friends
     relations = add_family_friend_antirelation(relations,
@@ -40,5 +35,4 @@ async def optimize_tables(
     
     return TablesResponse(tables=tables.seats, 
                           tables_scores=tables.get_tables_scores(),
-                          score_history=tables.score_history
-                         )
+                          score_history=tables.score_history )

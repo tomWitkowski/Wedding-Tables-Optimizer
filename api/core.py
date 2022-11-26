@@ -8,9 +8,19 @@ import numpy as np
 
 
 class Tables:
+    """
+    A class describing a set of tables with guests
+    Tables' goal is to optimize average relation between guests in all tables
     
+    Assumptions:
+        - relations between guests are defined properly
+        - distance between guest in one table is neglected
+    """
     @staticmethod
     def get_init_seats(guests: list, max_seats: int, I: int = 0):
+        """
+        Sets initial random tables
+        """
         hall = [[] for _ in range(ceil(len(guests) / max_seats))]
         guests = list(guests)
         np.random.shuffle(guests)
@@ -36,7 +46,7 @@ class Tables:
         
     
     def get_table_score(self, table: list) -> int:
-        raw_scores = [self.relation_graph.get_edge_data(*x) for x in itertools.combinations(table,2)]
+        raw_scores = [self.relation_graph.get_edge_data(*x) for x in itertools.combinations(table, 2)]
         return sum([float(x['score']) for x in raw_scores if x!=None])/len(table)
     
     
@@ -53,6 +63,9 @@ class Tables:
         
         
     def cross_random_seats(self, persons: int = 4):
+        """
+        Exchange {persons} guests between random tables
+        """
         if persons >= len(self.seats[0]):
             raise ValueError('number of switched peaple should be lower than number of seats')
         
@@ -79,7 +92,6 @@ class Tables:
         """
         Moves one or two persons to the table with a minimal number of persons
         """
-        
         seats = deepcopy(self.seats)
         
         # shorter table
@@ -105,6 +117,10 @@ class Tables:
     
     
     def iteration(self, n_shuffles: int = 100, n_person: int = 2):
+        """
+        It basically makes guests running and switching tables randomly
+        to check if these operations increase overall relations in tables
+        """
         hall_set = [self.seats]
         hall_set += [self.cross_random_seats(n_person) for _ in range(n_shuffles)]
         hall_set += [self.move_random_person() for _ in range(n_shuffles)]
@@ -115,6 +131,9 @@ class Tables:
         
         
     def optimize(self, iterations: int = 200, n_shuffles: int = 50, n_person: int = 2):
+        """
+        Run iterations repeatedly
+        """
         for _ in range(iterations):
             self.iteration(n_shuffles, n_person)
             
