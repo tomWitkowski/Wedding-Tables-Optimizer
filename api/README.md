@@ -1,1 +1,2 @@
-API that aptimizes guest plan in tables
+API that optimizes guest plan in tables
+Build chiefly on FastAPI and Networkx
