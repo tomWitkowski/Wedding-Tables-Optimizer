@@ -35,11 +35,11 @@ class PersonRelations(BaseModel):
                                         description='relations with other guests'
                                        )
     
-    class Config:
-        schema_extra = {
+    class ConfigDict:
+        json_schema_extra = {
             'example':{
-                'person_id':3, 
-                'state':'f', 
+                'person_id':3,
+                'state':'f',
                 'relations':{1:1.5, 4:-3, 2:10}
             }
         }

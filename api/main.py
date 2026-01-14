@@ -1,10 +1,30 @@
 from fastapi import FastAPI, Body
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from api_models import PersonRelations, TablesResponse, OptimizationData
 from utils import add_family_friend_antirelation
 from core import Tables, create_relation_graph
 from typing import List
+import os
 
-app = FastAPI()
+app = FastAPI(
+    title="Wedding Tables Optimizer",
+    description="Optimize wedding table seating based on guest relationships",
+    version="2.0.0"
+)
+
+# CORS middleware for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify exact origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Serve static files if frontend build exists
+if os.path.exists("../frontend/build"):
+    app.mount("/static", StaticFiles(directory="../frontend/build/static"), name="static")
 
 
 @app.get('/')

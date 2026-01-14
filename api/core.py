@@ -66,25 +66,36 @@ class Tables:
         """
         Exchange {persons} guests between random tables
         """
-        if persons >= len(self.seats[0]):
-            raise ValueError('number of switched peaple should be lower than number of seats')
-        
         seats = deepcopy(self.seats)
-        
+
+        # Need at least 2 tables to cross-swap
+        if len(self.seats) < 2:
+            return seats
+
         i1, i2 = self.get_random_tables()
-        
+
         seats1 = seats[i1]
         seats2 = seats[i2]
 
-        persons1 = np.random.choice(seats1, persons, False).tolist()
-        persons2 = np.random.choice(seats2, persons, False).tolist()
+        # Adjust number of persons to swap based on table sizes
+        max_swappable = min(len(seats1), len(seats2), persons)
+
+        # Need at least 1 person to swap
+        if max_swappable < 1:
+            return seats
+
+        # Randomly choose how many to swap (1 to max_swappable)
+        num_to_swap = np.random.randint(1, max_swappable + 1) if max_swappable > 1 else 1
+
+        persons1 = np.random.choice(seats1, num_to_swap, False).tolist()
+        persons2 = np.random.choice(seats2, num_to_swap, False).tolist()
 
         [seats1.remove(person) for person in persons1]
         [seats2.remove(person) for person in persons2]
-        
+
         seats1 += persons2
         seats2 += persons1
-        
+
         return seats
     
     
@@ -93,26 +104,38 @@ class Tables:
         Moves one or two persons to the table with a minimal number of persons
         """
         seats = deepcopy(self.seats)
-        
+
+        # Need at least 2 tables to move between tables
+        if len(self.seats) < 2:
+            return seats
+
         # shorter table
         i2 = np.argmin([len(x) for x in self.seats])
-        
-        # random table
-        i1 = np.random.choice([x for x in range(len(self.seats)) if x != i2], 1)[0]
-        
+
+        # random table (must be different from i2)
+        other_tables = [x for x in range(len(self.seats)) if x != i2]
+        if not other_tables:
+            return seats
+        i1 = np.random.choice(other_tables, 1)[0]
+
         seats1 = seats[i1]
         seats2 = seats[i2]
 
-        persons1 = np.random.choice(seats1, 
-                                    np.random.randint(
-                                        1,
-                                        min((self.max_seats-len(self.seats[i2]))+1,3)),
-                                    False).tolist()
+        # Calculate max persons to move (avoid moving too many or creating invalid range)
+        available_space = self.max_seats - len(self.seats[i2])
+        max_persons_to_move = min(available_space, len(seats1) - 1, 2)
+
+        # Ensure we have a valid range
+        if max_persons_to_move < 1:
+            return seats  # Can't move anyone, return unchanged
+
+        num_persons = np.random.randint(1, max_persons_to_move + 1)
+        persons1 = np.random.choice(seats1, num_persons, False).tolist()
 
         [seats1.remove(person) for person in persons1]
-        
+
         seats2 += persons1
-        
+
         return seats
     
     
